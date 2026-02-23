@@ -3,6 +3,7 @@ import Head from "next/head";
 import React, { useEffect, useRef, useState } from "react";
 import Web3Modal from "web3modal";
 import styles from "../styles/Home.module.css";
+import useDebounce from "../hooks/useDebounce";
 import { addLiquidity, calculateCD } from "../utils/addLiquidity";
 import {
   getCDTokensBalance,
@@ -67,6 +68,33 @@ export default function Home() {
   const web3ModalRef = useRef();
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
+
+  // Debounced values to limit RPC calls
+  const debouncedSwapAmount = useDebounce(swapAmount, 500);
+  const debouncedRemoveLPTokens = useDebounce(removeLPTokens, 500);
+
+  /**
+   * Effect to trigger swap calculation when debouncedSwapAmount changes
+   */
+  useEffect(() => {
+    if (debouncedSwapAmount && debouncedSwapAmount !== "0") {
+      _getAmountOfTokensReceivedFromSwap(debouncedSwapAmount);
+    } else {
+      setTokenToBeRecievedAfterSwap(zero);
+    }
+  }, [debouncedSwapAmount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
+   * Effect to trigger remove liquidity calculation when debouncedRemoveLPTokens changes
+   */
+  useEffect(() => {
+    if (debouncedRemoveLPTokens && debouncedRemoveLPTokens !== "0") {
+      _getTokensAfterRemove(debouncedRemoveLPTokens);
+    } else {
+      setRemoveCD(zero);
+      setRemoveEther(zero);
+    }
+  }, [debouncedRemoveLPTokens]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * getAmounts call various functions to retrive amounts for ethbalance,
@@ -413,11 +441,8 @@ export default function Home() {
               <input
                 type="number"
                 placeholder="Amount of LP Tokens"
-                onChange={async (e) => {
+                onChange={(e) => {
                   setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would recieve
-                  // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
                 }}
                 className={styles.input}
               />
@@ -439,10 +464,8 @@ export default function Home() {
           <input
             type="number"
             placeholder="Amount"
-            onChange={async (e) => {
+            onChange={(e) => {
               setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
             }}
             className={styles.input}
             value={swapAmount}
@@ -451,10 +474,10 @@ export default function Home() {
             className={styles.select}
             name="dropdown"
             id="dropdown"
-            onChange={async () => {
+            onChange={() => {
               setEthSelected(!ethSelected);
-              // Initialize the values back to zero
-              await _getAmountOfTokensReceivedFromSwap(0);
+              // Clear the calculated amount immediately
+              setTokenToBeRecievedAfterSwap(zero);
               setSwapAmount("");
             }}
           >
