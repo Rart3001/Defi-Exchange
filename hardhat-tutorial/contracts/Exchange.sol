@@ -19,6 +19,8 @@ contract Exchange is ERC20 {
         return ERC20(cryptoDevTokenAddress).balanceOf(address(this));
     }
 
+    uint constant MINIMUM_LIQUIDITY = 10**3;
+
     /**
     * @dev Adds liquidity to the exchange.
     */
@@ -40,7 +42,8 @@ contract Exchange is ERC20 {
             // by the user in the current `addLiquidity` call
             // `liquidity` tokens that need to be minted to the user on `addLiquidity` call shouls always be propotional
             // to the eth specified by the user
-            liquidity = ethBalance;
+            liquidity = ethBalance - MINIMUM_LIQUIDITY;
+            _mint(0x000000000000000000000000000000000000dEaD, MINIMUM_LIQUIDITY); // Permanently lock the first MINIMUM_LIQUIDITY tokens
             _mint(msg.sender, liquidity);
         } else {
             /* 
