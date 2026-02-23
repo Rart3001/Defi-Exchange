@@ -496,14 +496,20 @@ export default function Home() {
           <div>
             <button
               className={styles.button}
+              style={{
+                backgroundColor: liquidityTab ? "purple" : "darkgray",
+              }}
               onClick={() => {
-                setLiquidityTab(!liquidityTab);
+                setLiquidityTab(true);
               }}
             >
               Liquidity
             </button>
             <button
               className={styles.button}
+              style={{
+                backgroundColor: !liquidityTab ? "purple" : "darkgray",
+              }}
               onClick={() => {
                 setLiquidityTab(false);
               }}
@@ -514,7 +520,7 @@ export default function Home() {
           {renderButton()}
         </div>
         <div>
-          <img className={styles.image} src="./cryptodev.svg" />
+          <img className={styles.image} src="./cryptodev.svg" alt="Crypto Devs" />
         </div>
       </div>
 
