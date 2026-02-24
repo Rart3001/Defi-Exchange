@@ -52,7 +52,7 @@ export const addLiquidity = async (
  * calculateCD calculates the CD tokens that need to be added to the liquidity
  * given `_addEtherAmountWei` amount of ether
  */
-export const calculateCD = async (
+export const calculateCD = (
   _addEther = "0",
   etherBalanceContract,
   cdTokenReserve
