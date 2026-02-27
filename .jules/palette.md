@@ -1,0 +1,3 @@
+## 2024-05-22 - Context-Aware Input Labels
+**Learning:** Dynamic placeholders and ARIA labels significantly improve clarity in mode-dependent inputs (e.g., swapping between Ether and Token). Users can immediately understand what currency is expected without relying solely on the dropdown state.
+**Action:** When designing inputs that change purpose based on another control, always update the `placeholder` and `aria-label` dynamically to reflect the current context.
