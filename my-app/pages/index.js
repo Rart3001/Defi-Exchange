@@ -78,19 +78,33 @@ export default function Home() {
       const signer = await getProviderOrSigner(true);
       const address = await signer.getAddress();
       // get the amount of eth in the user's account
-      const _ethBalance = await getEtherBalance(provider, address);
+      const _ethBalancePromise = getEtherBalance(provider, address);
       // get the amount of `Crypto Dev` tokens held by the user
-      const _cdBalance = await getCDTokensBalance(provider, address);
+      const _cdBalancePromise = getCDTokensBalance(provider, address);
       // get the amount of `Crypto Dev` LP tokens held by the user
-      const _lpBalance = await getLPTokensBalance(provider, address);
+      const _lpBalancePromise = getLPTokensBalance(provider, address);
       // gets the amount of `CD` tokens that are present in the reserve of the `Exchange contract`
-      const _reservedCD = await getReserveOfCDTokens(provider);
+      const _reservedCDPromise = getReserveOfCDTokens(provider);
       // Get the ether reserves in the contract
-      const _ethBalanceContract = await getEtherBalance(provider, null, true);
+      const _ethBalanceContractPromise = getEtherBalance(provider, null, true);
+
+      const [
+        _ethBalance,
+        _cdBalance,
+        _lpBalance,
+        _reservedCD,
+        _ethBalanceContract,
+      ] = await Promise.all([
+        _ethBalancePromise,
+        _cdBalancePromise,
+        _lpBalancePromise,
+        _reservedCDPromise,
+        _ethBalanceContractPromise,
+      ]);
+
       setEtherBalance(_ethBalance);
       setCDBalance(_cdBalance);
       setLPBalance(_lpBalance);
-      setReservedCD(_reservedCD);
       setReservedCD(_reservedCD);
       setEtherBalanceContract(_ethBalanceContract);
     } catch (err) {
