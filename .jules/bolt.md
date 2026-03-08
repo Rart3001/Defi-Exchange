@@ -1,0 +1,3 @@
+## 2024-05-24 - Batch Blockchain Read Operations with Promise.all
+**Learning:** Sequential blockchain read operations (e.g. `getEtherBalance`, `getCDTokensBalance` called sequentially) cause unecessary network round-trips and drastically slow down component rendering time. This is especially true when fetching the initial state of a dApp across various contracts.
+**Action:** Always wrap independent blockchain read operations in `Promise.all` rather than using sequential `await`s to execute them concurrently and reduce overall latency. Also, instead of making a duplicate call to `getProviderOrSigner(false)`, we can extract the `provider` from the signer via `signer.provider`.
