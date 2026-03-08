@@ -74,23 +74,29 @@ export default function Home() {
    */
   const getAmounts = async () => {
     try {
-      const provider = await getProviderOrSigner(false);
       const signer = await getProviderOrSigner(true);
+      const provider = signer.provider;
       const address = await signer.getAddress();
-      // get the amount of eth in the user's account
-      const _ethBalance = await getEtherBalance(provider, address);
-      // get the amount of `Crypto Dev` tokens held by the user
-      const _cdBalance = await getCDTokensBalance(provider, address);
-      // get the amount of `Crypto Dev` LP tokens held by the user
-      const _lpBalance = await getLPTokensBalance(provider, address);
-      // gets the amount of `CD` tokens that are present in the reserve of the `Exchange contract`
-      const _reservedCD = await getReserveOfCDTokens(provider);
-      // Get the ether reserves in the contract
-      const _ethBalanceContract = await getEtherBalance(provider, null, true);
+
+      // ⚡ Bolt Optimization: Batch independent blockchain read operations into a single Promise.all
+      // This reduces network round-trips and makes the application measurably faster.
+      const [
+        _ethBalance,
+        _cdBalance,
+        _lpBalance,
+        _reservedCD,
+        _ethBalanceContract
+      ] = await Promise.all([
+        getEtherBalance(provider, address), // eth in the user's account
+        getCDTokensBalance(provider, address), // `Crypto Dev` tokens held by the user
+        getLPTokensBalance(provider, address), // `Crypto Dev` LP tokens held by the user
+        getReserveOfCDTokens(provider), // amount of `CD` tokens that are present in the reserve
+        getEtherBalance(provider, null, true) // ether reserves in the contract
+      ]);
+
       setEtherBalance(_ethBalance);
       setCDBalance(_cdBalance);
       setLPBalance(_lpBalance);
-      setReservedCD(_reservedCD);
       setReservedCD(_reservedCD);
       setEtherBalanceContract(_ethBalanceContract);
     } catch (err) {
@@ -236,10 +242,14 @@ export default function Home() {
       const provider = await getProviderOrSigner();
       // Convert the LP tokens entered by the user to a BigNumber
       const removeLPTokenWei = utils.parseEther(_removeLPTokens);
-      // Get the Eth reserves within the exchange contract
-      const _ethBalance = await getEtherBalance(provider, null, true);
-      // get the crypto dev token reserves from the contract
-      const cryptoDevTokenReserve = await getReserveOfCDTokens(provider);
+
+      // ⚡ Bolt Optimization: Batch independent blockchain read operations into a single Promise.all
+      // This reduces network latency by fetching contract balances concurrently
+      const [_ethBalance, cryptoDevTokenReserve] = await Promise.all([
+        getEtherBalance(provider, null, true), // Eth reserves
+        getReserveOfCDTokens(provider) // Crypto dev token reserves
+      ]);
+
       // call the getTokensAfterRemove from the utils folder
       const { _removeEther, _removeCD } = await getTokensAfterRemove(
         provider,
