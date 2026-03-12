@@ -1,0 +1,3 @@
+## 2024-05-24 - Batch Independent RPC Calls with Promise.all
+**Learning:** In DApps relying on multiple blockchain state reads (e.g., retrieving balances, reserves, or allowances), sequentially `await`ing independent RPC calls introduces significant performance bottlenecks due to accumulated network round-trip latency. This is a common codebase-specific anti-pattern, particularly in data-fetching functions like `getAmounts` or pre-computation steps before transactions.
+**Action:** Always wrap independent blockchain read operations (e.g., `provider.getBalance`, `contract.balanceOf`, `contract.getReserve`) in a `Promise.all` array to execute them concurrently, drastically reducing the overall latency and improving the user experience, especially on slower networks.
