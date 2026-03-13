@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract Exchange is ERC20 {
+contract Exchange is ERC20, ReentrancyGuard {
 
     address public cryptoDevTokenAddress;
 
@@ -24,7 +25,7 @@ contract Exchange is ERC20 {
     /**
     * @dev Adds liquidity to the exchange.
     */
-    function addLiquidity(uint _amount) public payable returns (uint) {
+    function addLiquidity(uint _amount) public payable nonReentrant returns (uint) {
         uint liquidity;
         uint ethBalance = address(this).balance;
         uint cryptoDevTokenReserve = getReserve();
@@ -78,7 +79,7 @@ contract Exchange is ERC20 {
         @dev Returns the amount Eth/Crypto Dev tokens that would be returned to the user
         * in the swap
     */
-    function removeLiquidity(uint _amount) public returns (uint , uint) {
+    function removeLiquidity(uint _amount) public nonReentrant returns (uint , uint) {
         require(_amount > 0, "_amount should be greater than zero");
         uint ethReserve = address(this).balance;
         uint _totalSupply = totalSupply();
@@ -133,7 +134,7 @@ contract Exchange is ERC20 {
     /** 
     @dev Swaps Ether for CryptoDev Tokens
     */
-    function ethToCryptoDevToken(uint _minTokens) public payable {
+    function ethToCryptoDevToken(uint _minTokens) public payable nonReentrant {
         uint256 tokenReserve = getReserve();
         // call the `getAmountOfTokens` to get the amount of crypto dev tokens
         // that would be returned to the user after the swap
@@ -156,7 +157,7 @@ contract Exchange is ERC20 {
     /** 
     @dev Swaps CryptoDev Tokens for Ether
     */
-    function cryptoDevTokenToEth(uint _tokensSold, uint _minEth) public {
+    function cryptoDevTokenToEth(uint _tokensSold, uint _minEth) public nonReentrant {
        uint256 tokenReserve = getReserve();
         // call the `getAmountOfTokens` to get the amount of ether
         // that would be returned to the user after the swap
