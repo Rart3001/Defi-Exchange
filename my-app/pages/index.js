@@ -68,6 +68,11 @@ export default function Home() {
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
 
+  // Debounce timers for input fields to prevent excessive RPC calls
+  const addEtherTimerRef = useRef();
+  const removeLPTimerRef = useRef();
+  const swapTimerRef = useRef();
+
   /**
    * getAmounts call various functions to retrive amounts for ethbalance,
    * LP tokens etc
@@ -386,16 +391,24 @@ export default function Home() {
                 <input
                   type="number"
                   placeholder="Amount of Ether"
-                  onChange={async (e) => {
-                    setAddEther(e.target.value || "0");
-                    // calculate the number of CD tokens that
-                    // can be added given  `e.target.value` amount of Eth
-                    const _addCDTokens = await calculateCD(
-                      e.target.value || "0",
-                      etherBalanceContract,
-                      reservedCD
-                    );
-                    setAddCDTokens(_addCDTokens);
+                  onChange={(e) => {
+                    const value = e.target.value || "0";
+                    setAddEther(value);
+                    // clear the previous timer
+                    if (addEtherTimerRef.current) {
+                      clearTimeout(addEtherTimerRef.current);
+                    }
+                    // debounce the RPC call
+                    addEtherTimerRef.current = setTimeout(async () => {
+                      // calculate the number of CD tokens that
+                      // can be added given  `value` amount of Eth
+                      const _addCDTokens = await calculateCD(
+                        value,
+                        etherBalanceContract,
+                        reservedCD
+                      );
+                      setAddCDTokens(_addCDTokens);
+                    }, 500);
                   }}
                   className={styles.input}
                 />
@@ -413,11 +426,19 @@ export default function Home() {
               <input
                 type="number"
                 placeholder="Amount of LP Tokens"
-                onChange={async (e) => {
-                  setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would recieve
-                  // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
+                onChange={(e) => {
+                  const value = e.target.value || "0";
+                  setRemoveLPTokens(value);
+                  // clear the previous timer
+                  if (removeLPTimerRef.current) {
+                    clearTimeout(removeLPTimerRef.current);
+                  }
+                  // debounce the RPC call
+                  removeLPTimerRef.current = setTimeout(async () => {
+                    // Calculate the amount of Ether and CD tokens that the user would recieve
+                    // After he removes `value` amount of `LP` tokens
+                    await _getTokensAfterRemove(value);
+                  }, 500);
                 }}
                 className={styles.input}
               />
@@ -439,10 +460,18 @@ export default function Home() {
           <input
             type="number"
             placeholder="Amount"
-            onChange={async (e) => {
-              setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
+            onChange={(e) => {
+              const value = e.target.value || "";
+              setSwapAmount(value);
+              // clear the previous timer
+              if (swapTimerRef.current) {
+                clearTimeout(swapTimerRef.current);
+              }
+              // debounce the RPC call
+              swapTimerRef.current = setTimeout(async () => {
+                // Calculate the amount of tokens user would recieve after the swap
+                await _getAmountOfTokensReceivedFromSwap(value || "0");
+              }, 500);
             }}
             className={styles.input}
             value={swapAmount}
