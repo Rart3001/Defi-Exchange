@@ -496,6 +496,7 @@ export default function Home() {
           <div>
             <button
               className={styles.button}
+              aria-pressed={liquidityTab}
               style={{
                 backgroundColor: liquidityTab ? "purple" : "darkgray",
               }}
@@ -507,6 +508,7 @@ export default function Home() {
             </button>
             <button
               className={styles.button}
+              aria-pressed={!liquidityTab}
               style={{
                 backgroundColor: !liquidityTab ? "purple" : "darkgray",
               }}
