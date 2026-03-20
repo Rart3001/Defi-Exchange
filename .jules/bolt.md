@@ -1,0 +1,3 @@
+## 2023-10-27 - Debouncing Input Handlers for RPC Calls
+**Learning:** Input handlers in Web3 React applications that trigger blockchain read operations (like calculating expected tokens) can cause severe performance bottlenecks and hit RPC rate limits if not debounced. Every keystroke triggers a network request.
+**Action:** Always debounce input handlers that trigger RPC calls. When using React, use `useRef` to store the timer ID across renders, and ensure `e.target.value` is extracted synchronously before the asynchronous `setTimeout` callback executes to avoid accessing a potentially nullified event object.
