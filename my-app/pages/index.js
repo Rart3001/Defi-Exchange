@@ -68,6 +68,23 @@ export default function Home() {
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
 
+  // References to keep track of setTimeout IDs for debouncing inputs
+  const debounceTimers = useRef({
+    addEther: null,
+    removeLPTokens: null,
+    swapAmount: null,
+  });
+
+  // Clear any pending timeouts when the component unmounts
+  useEffect(() => {
+    const timers = debounceTimers.current;
+    return () => {
+      if (timers.addEther) clearTimeout(timers.addEther);
+      if (timers.removeLPTokens) clearTimeout(timers.removeLPTokens);
+      if (timers.swapAmount) clearTimeout(timers.swapAmount);
+    };
+  }, []);
+
   /**
    * getAmounts call various functions to retrive amounts for ethbalance,
    * LP tokens etc
@@ -387,15 +404,19 @@ export default function Home() {
                   type="number"
                   placeholder="Amount of Ether"
                   onChange={async (e) => {
-                    setAddEther(e.target.value || "0");
-                    // calculate the number of CD tokens that
-                    // can be added given  `e.target.value` amount of Eth
-                    const _addCDTokens = await calculateCD(
-                      e.target.value || "0",
-                      etherBalanceContract,
-                      reservedCD
-                    );
-                    setAddCDTokens(_addCDTokens);
+                    const val = e.target.value || "0";
+                    setAddEther(val);
+                    if (debounceTimers.current.addEther) clearTimeout(debounceTimers.current.addEther);
+                    debounceTimers.current.addEther = setTimeout(async () => {
+                      // calculate the number of CD tokens that
+                      // can be added given  `val` amount of Eth
+                      const _addCDTokens = await calculateCD(
+                        val,
+                        etherBalanceContract,
+                        reservedCD
+                      );
+                      setAddCDTokens(_addCDTokens);
+                    }, 500);
                   }}
                   className={styles.input}
                 />
@@ -414,10 +435,14 @@ export default function Home() {
                 type="number"
                 placeholder="Amount of LP Tokens"
                 onChange={async (e) => {
-                  setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would recieve
-                  // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
+                  const val = e.target.value || "0";
+                  setRemoveLPTokens(val);
+                  if (debounceTimers.current.removeLPTokens) clearTimeout(debounceTimers.current.removeLPTokens);
+                  debounceTimers.current.removeLPTokens = setTimeout(async () => {
+                    // Calculate the amount of Ether and CD tokens that the user would recieve
+                    // After he removes `val` amount of `LP` tokens
+                    await _getTokensAfterRemove(val);
+                  }, 500);
                 }}
                 className={styles.input}
               />
@@ -440,9 +465,13 @@ export default function Home() {
             type="number"
             placeholder="Amount"
             onChange={async (e) => {
-              setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
+              const val = e.target.value || "";
+              setSwapAmount(val);
+              if (debounceTimers.current.swapAmount) clearTimeout(debounceTimers.current.swapAmount);
+              debounceTimers.current.swapAmount = setTimeout(async () => {
+                // Calculate the amount of tokens user would recieve after the swap
+                await _getAmountOfTokensReceivedFromSwap(val || "0");
+              }, 500);
             }}
             className={styles.input}
             value={swapAmount}
