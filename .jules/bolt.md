@@ -1,0 +1,3 @@
+## 2024-05-14 - Debouncing input handlers to prevent excessive RPC calls
+**Learning:** React input handlers that trigger expensive asynchronous operations (like RPC calls to calculate token amounts or swap values) can cause performance issues and unnecessary network traffic if executed on every keystroke.
+**Action:** Debounce these input handlers using `useRef` and `setTimeout`. Extract `e.target.value` immediately, update the local state for a responsive UI, and then wrap the expensive operation in the `setTimeout` callback. Always remember to add a `useEffect` cleanup hook to clear the timeouts on component unmount to prevent memory leaks.
