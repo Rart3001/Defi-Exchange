@@ -364,12 +364,14 @@ export default function Home() {
                 <input
                   type="number"
                   placeholder="Amount of Ether"
+                  aria-label="Amount of Ether"
                   onChange={(e) => setAddEther(e.target.value || "0")}
                   className={styles.input}
                 />
                 <input
                   type="number"
                   placeholder="Amount of CryptoDev tokens"
+                  aria-label="Amount of CryptoDev tokens"
                   onChange={(e) =>
                     setAddCDTokens(
                       BigNumber.from(utils.parseEther(e.target.value || "0"))
@@ -386,6 +388,7 @@ export default function Home() {
                 <input
                   type="number"
                   placeholder="Amount of Ether"
+                  aria-label="Amount of Ether"
                   onChange={async (e) => {
                     setAddEther(e.target.value || "0");
                     // calculate the number of CD tokens that
@@ -413,6 +416,7 @@ export default function Home() {
               <input
                 type="number"
                 placeholder="Amount of LP Tokens"
+                aria-label="Amount of LP Tokens"
                 onChange={async (e) => {
                   setRemoveLPTokens(e.target.value || "0");
                   // Calculate the amount of Ether and CD tokens that the user would recieve
@@ -439,6 +443,7 @@ export default function Home() {
           <input
             type="number"
             placeholder="Amount"
+            aria-label="Amount"
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
               // Calculate the amount of tokens user would recieve after the swap
@@ -451,6 +456,7 @@ export default function Home() {
             className={styles.select}
             name="dropdown"
             id="dropdown"
+            aria-label="Select token to swap"
             onChange={async () => {
               setEthSelected(!ethSelected);
               // Initialize the values back to zero
@@ -495,6 +501,7 @@ export default function Home() {
           </div>
           <div>
             <button
+              aria-pressed={liquidityTab}
               className={styles.button}
               style={{
                 backgroundColor: liquidityTab ? "purple" : "darkgray",
@@ -506,6 +513,7 @@ export default function Home() {
               Liquidity
             </button>
             <button
+              aria-pressed={!liquidityTab}
               className={styles.button}
               style={{
                 backgroundColor: !liquidityTab ? "purple" : "darkgray",
