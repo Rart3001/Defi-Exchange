@@ -65,6 +65,12 @@ export default function Home() {
   /** Wallet connection */
   // Create a reference to the Web3 Modal (used for connecting to Metamask) which persists as long as the page is open
   const web3ModalRef = useRef();
+
+  /** Timeout Refs for debouncing */
+  const addEtherTimeoutRef = useRef(null);
+  const removeLPTimeoutRef = useRef(null);
+  const swapTimeoutRef = useRef(null);
+
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
 
@@ -324,6 +330,15 @@ export default function Home() {
     }
   }, [walletConnected]);
 
+  // Cleanup timeout intervals on component unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(addEtherTimeoutRef.current);
+      clearTimeout(removeLPTimeoutRef.current);
+      clearTimeout(swapTimeoutRef.current);
+    };
+  }, []);
+
   /*
       renderButton: Returns a button based on the state of the dapp
   */
@@ -387,15 +402,21 @@ export default function Home() {
                   type="number"
                   placeholder="Amount of Ether"
                   onChange={async (e) => {
-                    setAddEther(e.target.value || "0");
-                    // calculate the number of CD tokens that
-                    // can be added given  `e.target.value` amount of Eth
-                    const _addCDTokens = await calculateCD(
-                      e.target.value || "0",
-                      etherBalanceContract,
-                      reservedCD
-                    );
-                    setAddCDTokens(_addCDTokens);
+                    const value = e.target.value || "0";
+                    setAddEther(value);
+                    if (addEtherTimeoutRef.current) {
+                      clearTimeout(addEtherTimeoutRef.current);
+                    }
+                    addEtherTimeoutRef.current = setTimeout(async () => {
+                      // calculate the number of CD tokens that
+                      // can be added given  `e.target.value` amount of Eth
+                      const _addCDTokens = await calculateCD(
+                        value,
+                        etherBalanceContract,
+                        reservedCD
+                      );
+                      setAddCDTokens(_addCDTokens);
+                    }, 500);
                   }}
                   className={styles.input}
                 />
@@ -414,10 +435,16 @@ export default function Home() {
                 type="number"
                 placeholder="Amount of LP Tokens"
                 onChange={async (e) => {
-                  setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would recieve
-                  // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
+                  const value = e.target.value || "0";
+                  setRemoveLPTokens(value);
+                  if (removeLPTimeoutRef.current) {
+                    clearTimeout(removeLPTimeoutRef.current);
+                  }
+                  removeLPTimeoutRef.current = setTimeout(async () => {
+                    // Calculate the amount of Ether and CD tokens that the user would recieve
+                    // After he removes `e.target.value` amount of `LP` tokens
+                    await _getTokensAfterRemove(value);
+                  }, 500);
                 }}
                 className={styles.input}
               />
@@ -440,9 +467,15 @@ export default function Home() {
             type="number"
             placeholder="Amount"
             onChange={async (e) => {
-              setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
+              const value = e.target.value || "";
+              setSwapAmount(value);
+              if (swapTimeoutRef.current) {
+                clearTimeout(swapTimeoutRef.current);
+              }
+              swapTimeoutRef.current = setTimeout(async () => {
+                // Calculate the amount of tokens user would recieve after the swap
+                await _getAmountOfTokensReceivedFromSwap(value || "0");
+              }, 500);
             }}
             className={styles.input}
             value={swapAmount}
