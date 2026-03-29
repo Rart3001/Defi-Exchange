@@ -366,6 +366,7 @@ export default function Home() {
                   placeholder="Amount of Ether"
                   onChange={(e) => setAddEther(e.target.value || "0")}
                   className={styles.input}
+                  aria-label="Amount of Ether"
                 />
                 <input
                   type="number"
@@ -376,6 +377,7 @@ export default function Home() {
                     )
                   }
                   className={styles.input}
+                  aria-label="Amount of CryptoDev tokens"
                 />
                 <button className={styles.button1} onClick={_addLiquidity}>
                   Add
@@ -398,6 +400,7 @@ export default function Home() {
                     setAddCDTokens(_addCDTokens);
                   }}
                   className={styles.input}
+                  aria-label="Amount of Ether"
                 />
                 <div className={styles.inputDiv}>
                   {/* Convert the BigNumber to string using the formatEther function from ethers.js */}
@@ -420,6 +423,7 @@ export default function Home() {
                   await _getTokensAfterRemove(e.target.value || "0");
                 }}
                 className={styles.input}
+                aria-label="Amount of LP Tokens"
               />
               <div className={styles.inputDiv}>
                 {/* Convert the BigNumber to string using the formatEther function from ethers.js */}
@@ -446,6 +450,7 @@ export default function Home() {
             }}
             className={styles.input}
             value={swapAmount}
+            aria-label="Amount to swap"
           />
           <select
             className={styles.select}
@@ -457,6 +462,7 @@ export default function Home() {
               await _getAmountOfTokensReceivedFromSwap(0);
               setSwapAmount("");
             }}
+            aria-label="Token to swap"
           >
             <option value="eth">Ethereum</option>
             <option value="cryptoDevToken">Crypto Dev Token</option>
@@ -502,6 +508,7 @@ export default function Home() {
               onClick={() => {
                 setLiquidityTab(true);
               }}
+              aria-pressed={liquidityTab}
             >
               Liquidity
             </button>
@@ -513,6 +520,7 @@ export default function Home() {
               onClick={() => {
                 setLiquidityTab(false);
               }}
+              aria-pressed={!liquidityTab}
             >
               Swap
             </button>
