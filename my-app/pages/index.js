@@ -329,6 +329,7 @@ export default function Home() {
   */
   const renderButton = () => {
     // If wallet is not connected, return a button which allows them to connect their wllet
+    /*
     if (!walletConnected) {
       return (
         <button onClick={connectWallet} className={styles.button}>
@@ -336,6 +337,7 @@ export default function Home() {
         </button>
       );
     }
+    */
 
     // If we are currently waiting for something, return a loading button
     if (loading) {
@@ -364,12 +366,14 @@ export default function Home() {
                 <input
                   type="number"
                   placeholder="Amount of Ether"
+                  aria-label="Amount of Ether"
                   onChange={(e) => setAddEther(e.target.value || "0")}
                   className={styles.input}
                 />
                 <input
                   type="number"
-                  placeholder="Amount of CryptoDev tokens"
+                  placeholder="Amount of Crypto Dev Tokens"
+                  aria-label="Amount of Crypto Dev Tokens"
                   onChange={(e) =>
                     setAddCDTokens(
                       BigNumber.from(utils.parseEther(e.target.value || "0"))
@@ -386,6 +390,7 @@ export default function Home() {
                 <input
                   type="number"
                   placeholder="Amount of Ether"
+                  aria-label="Amount of Ether"
                   onChange={async (e) => {
                     setAddEther(e.target.value || "0");
                     // calculate the number of CD tokens that
@@ -413,6 +418,7 @@ export default function Home() {
               <input
                 type="number"
                 placeholder="Amount of LP Tokens"
+                aria-label="Amount of LP Tokens"
                 onChange={async (e) => {
                   setRemoveLPTokens(e.target.value || "0");
                   // Calculate the amount of Ether and CD tokens that the user would recieve
@@ -438,7 +444,12 @@ export default function Home() {
         <div>
           <input
             type="number"
-            placeholder="Amount"
+            placeholder={
+              ethSelected ? "Amount of Ether" : "Amount of Crypto Dev Tokens"
+            }
+            aria-label={
+              ethSelected ? "Amount of Ether" : "Amount of Crypto Dev Tokens"
+            }
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
               // Calculate the amount of tokens user would recieve after the swap
