@@ -72,9 +72,12 @@ export const swapTokens = async (
   // call the `cryptoDevTokenToEth` function from the contract
   // As you can see you need to pass the `swapAmount` as a value to the function because
   // It is the ether we are paying to the contract, instead of a value we are passing to the function
+  // Calculate the amount of tokens to receive with 1% slippage tolerance
+  const minTokens = tokenToBeRecievedAfterSwap.mul(99).div(100);
+
   if (ethSelected) {
     tx = await exchangeContract.ethToCryptoDevToken(
-      tokenToBeRecievedAfterSwap,
+      minTokens,
       {
         value: swapAmountWei,
       }
@@ -90,7 +93,7 @@ export const swapTokens = async (
     // call cryptoDebTokenToEth function which would take in `swapAmounWei` of crypto dev tokens and would send back `tokenToBeRecievedAfterSwap` amount of ether to the user
     tx = await exchangeContract.cryptoDevTokenToEth(
       swapAmountWei,
-      tokenToBeRecievedAfterSwap
+      minTokens
     );
   }
   await tx.wait();
