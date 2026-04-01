@@ -67,6 +67,8 @@ export default function Home() {
   const web3ModalRef = useRef();
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
+  // Timer ID for debouncing RPC calls
+  const debounceTimerRef = useRef(null);
 
   /**
    * getAmounts call various functions to retrive amounts for ethbalance,
@@ -413,11 +415,17 @@ export default function Home() {
               <input
                 type="number"
                 placeholder="Amount of LP Tokens"
-                onChange={async (e) => {
-                  setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would recieve
-                  // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
+                onChange={(e) => {
+                  const val = e.target.value || "0";
+                  setRemoveLPTokens(val);
+                  // Debounce the calculation of Ether and CD tokens that the user would recieve
+                  // after he removes `val` amount of `LP` tokens
+                  if (debounceTimerRef.current) {
+                    clearTimeout(debounceTimerRef.current);
+                  }
+                  debounceTimerRef.current = setTimeout(async () => {
+                    await _getTokensAfterRemove(val);
+                  }, 500);
                 }}
                 className={styles.input}
               />
@@ -439,10 +447,16 @@ export default function Home() {
           <input
             type="number"
             placeholder="Amount"
-            onChange={async (e) => {
-              setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
+            onChange={(e) => {
+              const val = e.target.value || "";
+              setSwapAmount(val);
+              // Debounce the calculation of tokens user would recieve after the swap
+              if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+              }
+              debounceTimerRef.current = setTimeout(async () => {
+                await _getAmountOfTokensReceivedFromSwap(val || "0");
+              }, 500);
             }}
             className={styles.input}
             value={swapAmount}
