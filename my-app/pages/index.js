@@ -438,7 +438,8 @@ export default function Home() {
         <div>
           <input
             type="number"
-            placeholder="Amount"
+            placeholder={ethSelected ? "Amount of Ether" : "Amount of Crypto Dev Tokens"}
+            aria-label={ethSelected ? "Amount of Ether to swap" : "Amount of Crypto Dev Tokens to swap"}
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
               // Calculate the amount of tokens user would recieve after the swap
@@ -451,6 +452,7 @@ export default function Home() {
             className={styles.select}
             name="dropdown"
             id="dropdown"
+            aria-label="Select token to swap"
             onChange={async () => {
               setEthSelected(!ethSelected);
               // Initialize the values back to zero
