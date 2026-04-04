@@ -493,8 +493,12 @@ export default function Home() {
           <div className={styles.description}>
             Exchange Ethereum &#60;&#62; Crypto Dev Tokens
           </div>
-          <div>
+          <div role="tablist" aria-label="Exchange Options">
             <button
+              role="tab"
+              aria-selected={liquidityTab}
+              aria-controls="liquidity-panel"
+              id="liquidity-tab"
               className={styles.button}
               style={{
                 backgroundColor: liquidityTab ? "purple" : "darkgray",
@@ -506,6 +510,10 @@ export default function Home() {
               Liquidity
             </button>
             <button
+              role="tab"
+              aria-selected={!liquidityTab}
+              aria-controls="swap-panel"
+              id="swap-tab"
               className={styles.button}
               style={{
                 backgroundColor: !liquidityTab ? "purple" : "darkgray",
@@ -517,7 +525,13 @@ export default function Home() {
               Swap
             </button>
           </div>
-          {renderButton()}
+          <div
+            role="tabpanel"
+            id={liquidityTab ? "liquidity-panel" : "swap-panel"}
+            aria-labelledby={liquidityTab ? "liquidity-tab" : "swap-tab"}
+          >
+            {renderButton()}
+          </div>
         </div>
         <div>
           <img className={styles.image} src="./cryptodev.svg" alt="Crypto Devs" />
