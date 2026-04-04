@@ -67,6 +67,11 @@ export default function Home() {
   const web3ModalRef = useRef();
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
+  // Timeout refs are used to debounce inputs and prevent unnecessary RPC calls
+  // Separate refs prevent cross-input cancellation
+  const addTimeoutRef = useRef(null);
+  const removeTimeoutRef = useRef(null);
+  const swapTimeoutRef = useRef(null);
 
   /**
    * getAmounts call various functions to retrive amounts for ethbalance,
@@ -388,14 +393,21 @@ export default function Home() {
                   placeholder="Amount of Ether"
                   onChange={async (e) => {
                     setAddEther(e.target.value || "0");
-                    // calculate the number of CD tokens that
-                    // can be added given  `e.target.value` amount of Eth
-                    const _addCDTokens = await calculateCD(
-                      e.target.value || "0",
-                      etherBalanceContract,
-                      reservedCD
-                    );
-                    setAddCDTokens(_addCDTokens);
+                    // Debounce the RPC call to prevent expensive operations on every keystroke
+                    if (addTimeoutRef.current) {
+                      clearTimeout(addTimeoutRef.current);
+                    }
+                    const value = e.target.value || "0";
+                    addTimeoutRef.current = setTimeout(async () => {
+                      // calculate the number of CD tokens that
+                      // can be added given  `e.target.value` amount of Eth
+                      const _addCDTokens = await calculateCD(
+                        value,
+                        etherBalanceContract,
+                        reservedCD
+                      );
+                      setAddCDTokens(_addCDTokens);
+                    }, 500);
                   }}
                   className={styles.input}
                 />
@@ -415,9 +427,16 @@ export default function Home() {
                 placeholder="Amount of LP Tokens"
                 onChange={async (e) => {
                   setRemoveLPTokens(e.target.value || "0");
-                  // Calculate the amount of Ether and CD tokens that the user would recieve
-                  // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
+                  // Debounce the RPC call to prevent expensive operations on every keystroke
+                  if (removeTimeoutRef.current) {
+                    clearTimeout(removeTimeoutRef.current);
+                  }
+                  const value = e.target.value || "0";
+                  removeTimeoutRef.current = setTimeout(async () => {
+                    // Calculate the amount of Ether and CD tokens that the user would recieve
+                    // After he removes `e.target.value` amount of `LP` tokens
+                    await _getTokensAfterRemove(value);
+                  }, 500);
                 }}
                 className={styles.input}
               />
@@ -441,8 +460,15 @@ export default function Home() {
             placeholder="Amount"
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
-              // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
+              // Debounce the RPC call to prevent expensive operations on every keystroke
+              if (swapTimeoutRef.current) {
+                clearTimeout(swapTimeoutRef.current);
+              }
+              const value = e.target.value || "0";
+              swapTimeoutRef.current = setTimeout(async () => {
+                // Calculate the amount of tokens user would recieve after the swap
+                await _getAmountOfTokensReceivedFromSwap(value);
+              }, 500);
             }}
             className={styles.input}
             value={swapAmount}
