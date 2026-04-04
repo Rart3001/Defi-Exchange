@@ -1,0 +1,3 @@
+## 2024-05-24 - Sequential RPC fetching bottleneck
+**Learning:** In the `index.js` page, multiple independent RPC reads (like `getEtherBalance`, `getCDTokensBalance`, `getLPTokensBalance`) were being awaited sequentially. This causes the UI loading time to be the sum of all individual RPC call latencies, instead of just the latency of the slowest call, resulting in a significantly delayed initial render or update state.
+**Action:** When making multiple independent asynchronous calls (especially network requests or RPC calls to the blockchain), always batch them using `Promise.all` so they execute concurrently.
