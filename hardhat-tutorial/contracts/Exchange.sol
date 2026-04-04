@@ -101,7 +101,8 @@ contract Exchange is ERC20, ReentrancyGuard {
         // remove liquidity
         _burn(msg.sender, _amount);
         // Transfer `ethAmount` of Eth from user's wallet to the contract
-        payable(msg.sender).transfer(ethAmount);
+        (bool success, ) = msg.sender.call{value: ethAmount}("");
+        require(success, "Failed to send Ether");
         // Transfer `cryptoDevTokenAmount` of `Crypto Dev` tokens from the user's wallet to the contract 
         ERC20(cryptoDevTokenAddress).transfer(msg.sender, cryptoDevTokenAmount);
         return (ethAmount, cryptoDevTokenAmount);
@@ -174,6 +175,7 @@ contract Exchange is ERC20, ReentrancyGuard {
             _tokensSold
         );
         // send the `ethBought` to the user from the contract
-        payable(msg.sender).transfer(ethBought);
+        (bool success, ) = msg.sender.call{value: ethBought}("");
+        require(success, "Failed to send Ether");
     }
 }
