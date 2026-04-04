@@ -499,6 +499,7 @@ export default function Home() {
               style={{
                 backgroundColor: liquidityTab ? "purple" : "darkgray",
               }}
+              aria-pressed={liquidityTab}
               onClick={() => {
                 setLiquidityTab(true);
               }}
@@ -510,6 +511,7 @@ export default function Home() {
               style={{
                 backgroundColor: !liquidityTab ? "purple" : "darkgray",
               }}
+              aria-pressed={!liquidityTab}
               onClick={() => {
                 setLiquidityTab(false);
               }}
