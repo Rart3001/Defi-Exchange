@@ -438,7 +438,12 @@ export default function Home() {
         <div>
           <input
             type="number"
-            placeholder="Amount"
+            placeholder={
+              ethSelected ? "Amount of Ether" : "Amount of Crypto Dev Tokens"
+            }
+            aria-label={
+              ethSelected ? "Amount of Ether" : "Amount of Crypto Dev Tokens"
+            }
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
               // Calculate the amount of tokens user would recieve after the swap
@@ -493,8 +498,10 @@ export default function Home() {
           <div className={styles.description}>
             Exchange Ethereum &#60;&#62; Crypto Dev Tokens
           </div>
-          <div>
+          <div role="tablist">
             <button
+              role="tab"
+              aria-selected={liquidityTab}
               className={styles.button}
               style={{
                 backgroundColor: liquidityTab ? "purple" : "darkgray",
@@ -506,6 +513,8 @@ export default function Home() {
               Liquidity
             </button>
             <button
+              role="tab"
+              aria-selected={!liquidityTab}
               className={styles.button}
               style={{
                 backgroundColor: !liquidityTab ? "purple" : "darkgray",
