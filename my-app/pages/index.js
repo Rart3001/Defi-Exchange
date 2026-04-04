@@ -68,6 +68,11 @@ export default function Home() {
   // walletConnected keep track of whether the user's wallet is connected or not
   const [walletConnected, setWalletConnected] = useState(false);
 
+  /** Debounce timeouts */
+  const addEtherTimeout = useRef(null);
+  const removeLPTokensTimeout = useRef(null);
+  const swapAmountTimeout = useRef(null);
+
   /**
    * getAmounts call various functions to retrive amounts for ethbalance,
    * LP tokens etc
@@ -322,6 +327,13 @@ export default function Home() {
       connectWallet();
       getAmounts();
     }
+
+    // Cleanup timeouts on unmount
+    return () => {
+      clearTimeout(addEtherTimeout.current);
+      clearTimeout(removeLPTokensTimeout.current);
+      clearTimeout(swapAmountTimeout.current);
+    };
   }, [walletConnected]);
 
   /*
@@ -388,14 +400,18 @@ export default function Home() {
                   placeholder="Amount of Ether"
                   onChange={async (e) => {
                     setAddEther(e.target.value || "0");
+                    const val = e.target.value || "0";
+                    clearTimeout(addEtherTimeout.current);
                     // calculate the number of CD tokens that
                     // can be added given  `e.target.value` amount of Eth
-                    const _addCDTokens = await calculateCD(
-                      e.target.value || "0",
-                      etherBalanceContract,
-                      reservedCD
-                    );
-                    setAddCDTokens(_addCDTokens);
+                    addEtherTimeout.current = setTimeout(async () => {
+                      const _addCDTokens = await calculateCD(
+                        val,
+                        etherBalanceContract,
+                        reservedCD
+                      );
+                      setAddCDTokens(_addCDTokens);
+                    }, 500);
                   }}
                   className={styles.input}
                 />
@@ -415,9 +431,13 @@ export default function Home() {
                 placeholder="Amount of LP Tokens"
                 onChange={async (e) => {
                   setRemoveLPTokens(e.target.value || "0");
+                  const val = e.target.value || "0";
+                  clearTimeout(removeLPTokensTimeout.current);
                   // Calculate the amount of Ether and CD tokens that the user would recieve
                   // After he removes `e.target.value` amount of `LP` tokens
-                  await _getTokensAfterRemove(e.target.value || "0");
+                  removeLPTokensTimeout.current = setTimeout(async () => {
+                    await _getTokensAfterRemove(val);
+                  }, 500);
                 }}
                 className={styles.input}
               />
@@ -441,8 +461,12 @@ export default function Home() {
             placeholder="Amount"
             onChange={async (e) => {
               setSwapAmount(e.target.value || "");
+              const val = e.target.value || "0";
+              clearTimeout(swapAmountTimeout.current);
               // Calculate the amount of tokens user would recieve after the swap
-              await _getAmountOfTokensReceivedFromSwap(e.target.value || "0");
+              swapAmountTimeout.current = setTimeout(async () => {
+                await _getAmountOfTokensReceivedFromSwap(val);
+              }, 500);
             }}
             className={styles.input}
             value={swapAmount}
