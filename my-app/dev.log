@@ -1,0 +1,9 @@
+
+> my-app@ dev /app/my-app
+> next dev
+
+warn  - Port 3000 is in use, trying 3001 instead.
+ready - started server on 0.0.0.0:3001, url: http://localhost:3001
+event - compiled client and server successfully in 798 ms (171 modules)
+wait  - compiling / (client and server)...
+event - compiled client and server successfully in 1472 ms (335 modules)
