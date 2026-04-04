@@ -74,23 +74,29 @@ export default function Home() {
    */
   const getAmounts = async () => {
     try {
-      const provider = await getProviderOrSigner(false);
+      // Get signer first, then extract provider to avoid duplicate Web3Provider instantiation
       const signer = await getProviderOrSigner(true);
+      const provider = signer.provider;
       const address = await signer.getAddress();
-      // get the amount of eth in the user's account
-      const _ethBalance = await getEtherBalance(provider, address);
-      // get the amount of `Crypto Dev` tokens held by the user
-      const _cdBalance = await getCDTokensBalance(provider, address);
-      // get the amount of `Crypto Dev` LP tokens held by the user
-      const _lpBalance = await getLPTokensBalance(provider, address);
-      // gets the amount of `CD` tokens that are present in the reserve of the `Exchange contract`
-      const _reservedCD = await getReserveOfCDTokens(provider);
-      // Get the ether reserves in the contract
-      const _ethBalanceContract = await getEtherBalance(provider, null, true);
+
+      // Execute independent blockchain read operations concurrently for performance
+      const [
+        _ethBalance,
+        _cdBalance,
+        _lpBalance,
+        _reservedCD,
+        _ethBalanceContract
+      ] = await Promise.all([
+        getEtherBalance(provider, address), // eth in user's account
+        getCDTokensBalance(provider, address), // CD tokens held by user
+        getLPTokensBalance(provider, address), // LP tokens held by user
+        getReserveOfCDTokens(provider), // CD tokens in Exchange reserve
+        getEtherBalance(provider, null, true) // ether reserves in contract
+      ]);
+
       setEtherBalance(_ethBalance);
       setCDBalance(_cdBalance);
       setLPBalance(_lpBalance);
-      setReservedCD(_reservedCD);
       setReservedCD(_reservedCD);
       setEtherBalanceContract(_ethBalanceContract);
     } catch (err) {
