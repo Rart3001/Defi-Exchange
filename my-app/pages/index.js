@@ -502,6 +502,7 @@ export default function Home() {
               onClick={() => {
                 setLiquidityTab(true);
               }}
+              aria-pressed={liquidityTab}
             >
               Liquidity
             </button>
@@ -513,6 +514,7 @@ export default function Home() {
               onClick={() => {
                 setLiquidityTab(false);
               }}
+              aria-pressed={!liquidityTab}
             >
               Swap
             </button>
