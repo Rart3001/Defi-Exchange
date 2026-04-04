@@ -1,0 +1,8 @@
+
+> my-app@ dev /app/my-app
+> next dev
+
+ready - started server on 0.0.0.0:3000, url: http://localhost:3000
+event - compiled client and server successfully in 2.4s (171 modules)
+wait  - compiling / (client and server)...
+event - compiled client and server successfully in 2.3s (335 modules)
